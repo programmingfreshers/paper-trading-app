@@ -1,8 +1,8 @@
 const express = require("express");
-let { SmartAPI, WebSocket } = require("smartapi-javascript");
 const app = express();
-const port = 3000;
-
+const port = 4000;
+let { SmartAPI, WebSocket } = require("smartapi-javascript");
+const stockDataApiRouter = require('./stockDataApi')
 const stockDetails = [
   {
     token: "6818",
@@ -71,116 +71,28 @@ const stock = {
   exch_seg: "NSE",
   tick_size: "5.000000",
 };
-const userID = " "; // your angel user id
-const userPassword = " "; // your angel password
 
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-
+app.get("/",(req,res)=>{
+     res.setHeader("Content-Type", "application/json");
   let smart_api = new SmartAPI({
-    api_key: "BIdh60zo",
+    api_key: apiKey,
   });
-
   smart_api
     .generateSession(userID, userPassword)
     .then((data) => {
-      smart_api
-        .getProfile()
-        .then((data) => {
-          console.log(
-            "========================================================================"
-          );
-          console.log("Welcome " + data["data"]["name"]);
-          console.log(
-            "========================================================================"
-          );
-        })
-        .catch((err) => {});
-
-      //      Historical Methods
-      smart_api
-        .getCandleData({
-          exchange: "NSE",
-          symboltoken: stock.token,
-          interval: "ONE_DAY",
-          fromdate: "2019-07-08 03:00",
-          todate: "2022-07-08 03:00",
-        })
-        .then((data) => {
-          var ls = [];
-          var temp = 0;
-          var high = 0;
-          var ds = data["data"];
-          ds.forEach((elem) => {
-            ls.push(elem[3]);
-          });
-          ls.forEach((elem) => {
-            temp = elem;
-            if (high < temp) {
-              high = temp;
-              temp = 0;
-            }
-          });
-
-          smart_api
-            .getCandleData({
-              exchange: "NSE",
-              symboltoken: stock.token,
-              interval: "ONE_DAY",
-              fromdate: "2022-07-07 09:00",
-              todate: "2022-07-08 03:00",
-            })
-            .then((data) => {
-              var priceToday = data["data"][0][2];
-
-              var priceCorrection = ((high - priceToday) * 100) / high;
-              if (priceCorrection > 20) {
-                smart_api
-                  .placeOrder({
-                    variety: "NORMAL",
-                    tradingsymbol: stock.symbol,
-                    symboltoken: stock.token,
-                    transactiontype: "BUY",
-                    exchange: "NSE",
-                    ordertype: "LIMIT",
-                    producttype: "DELIVERY",
-                    duration: "DAY",
-                    price: priceToday * (1 + 0.005),
-                    squareoff: "0",
-                    stoploss: "0",
-                    quantity: "10",
-                  })
-                  .then((data) => {
-                    console.log(
-                      "Buy " +
-                        stock.symbol +
-                        "  [ " +
-                        data["message"] +
-                        " ]" +
-                        " at " +
-                        priceToday * (1 + 0.005)
-                    );
-                  })
-                  .catch((err) => {
-                    //   console.log("there is an error \n" + err)
-                  });
-              }
-            })
-            .catch((err) => {});
-
-          //   .catch((err) => {
-          //     console.log(err)
-          //   })
-        })
-        .catch((err) => {
-          //   console.log("errror 2" + err)
-        });
+      return smart_api.getProfile();
     })
-    .catch((err) => {
-      //    console.log(err)
+    .then((data) => {
+      console.log("hello");
+      console.log(data);
+      res.json({ work: "done" });
+    })
+    .catch((ex) => {
+      //Log error
     });
+});
+  
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
