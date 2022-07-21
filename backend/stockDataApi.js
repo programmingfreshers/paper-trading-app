@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const bodyparser = require("body-parser");
 let { SmartAPI, WebSocket } = require("smartapi-javascript");
-const userID = "S585340"; // your angel user id
-const userPassword = "angel@sam123"; // your angel password
-const apiKey = "fb0p6174"; // your api key
+const userID = ""; // your angel user id
+const userPassword = ""; // your angel password
+const apiKey = ""; // your api key
 
 router.get("/", (req, res) => {
   res.setHeader("Content-Type", "application/json");
